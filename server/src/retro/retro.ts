@@ -1,16 +1,18 @@
 import * as http from "http";
-import * as socketio from "socket.io";
 import { RetroPlayer } from './entities/player';
 import { RetroGlobalState } from './entities/global-state';
 import { RetroMessage } from './entities/message';
 import { RetroConfig, RetroRoomState } from './entities/room-state';
 import { RandomUtils } from '../utils/random-utils';
 import moment = require('moment');
+import { Server, Socket } from 'socket.io';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 
-interface RetroSocket extends socketio.Socket {
+interface RetroData {
 	player: RetroPlayer;
 	room?: string;
 }
+type RetroSocket = Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, RetroData>;
 
 type PlayerRole = 'player' | 'spectator'
 
@@ -27,12 +29,12 @@ interface ConfigData {
 
 export class Retro {
 	private globalState = new RetroGlobalState();
-	private retroSocket!: socketio.Server;
+	private retroSocket!: Server;
 
 	constructor(private server: http.Server) {}
 
 	start() {
-		this.retroSocket = socketio(this.server, {
+		this.retroSocket = new Server(this.server, {
 			pingInterval: 15000,
 			path: "/retro",
 		});
@@ -50,7 +52,7 @@ export class Retro {
 
 			socket.on("disconnect", () => this.disconnect(socket));
 			socket.on("room:ping", () => {
-				let player = socket.player;
+				let player = socket.data.player;
 				console.log(`Ping ${player?.name}`);
 			});
 			socket.on('state:set', state => this.importState(socket, state));
@@ -59,14 +61,14 @@ export class Retro {
 
 	private onJoin = (socket: RetroSocket, { room, uid, name }: JoinData) => {
 		console.log(`User ${name}(${uid}) joining room ${room}`);
-		if (socket.room) {
+		if (socket.data.room) {
 			socket.leave(room);
 		}
 		socket.join(room);
-		socket.room = room;
+		socket.data.room = room;
 
 		let player = new RetroPlayer(uid, name);
-		socket.player = player;
+		socket.data.player = player;
 
 		this.globalState.removePlayer(player);
 		let roomState = this.globalState.getRoom(room);
@@ -77,8 +79,8 @@ export class Retro {
 	}
 
 	private changeConfig(socket: RetroSocket, {property, value}: ConfigData): void {
-		let room = socket.room;
-		let player = socket.player;
+		let room = socket.data.room;
+		let player = socket.data.player;
 		console.log(`${room}: config ${property} = ${value}`);
 		if (room) {
 			let roomState = this.globalState.getRoom(room);
@@ -88,8 +90,8 @@ export class Retro {
 		}
 	}
 	private changeViewMode(socket: RetroSocket, viewMode: boolean): void {
-		let room = socket.room;
-		let player = socket.player;
+		let room = socket.data.room;
+		let player = socket.data.player;
 		console.log(`${room}: viewMode ${viewMode}`);
 		if (room) {
 			let roomState = this.globalState.getRoom(room);
@@ -103,8 +105,8 @@ export class Retro {
 		}
 	}
 	private saveMessage(socket: RetroSocket, message: RetroMessage): void {
-		let room = socket.room;
-		let player = socket.player;
+		let room = socket.data.room;
+		let player = socket.data.player;
 		console.log(`${room}: save ${JSON.stringify(message)}`);
 		if (room) {
 			let roomState = this.globalState.getRoom(room);
@@ -115,8 +117,8 @@ export class Retro {
 	}
 
 	private showMessage(socket: RetroSocket, messageUid: string): void {
-		let room = socket.room;
-		let player = socket.player;
+		let room = socket.data.room;
+		let player = socket.data.player;
 		console.log(`${room}: show ${messageUid}`);
 		if (room) {
 			let roomState = this.globalState.getRoom(room);
@@ -127,8 +129,8 @@ export class Retro {
 	}
 
 	private deleteMessage(socket: RetroSocket, messageUid: string): void {
-		let room = socket.room;
-		let player = socket.player;
+		let room = socket.data.room;
+		let player = socket.data.player;
 		console.log(`${room}: delete ${messageUid}`);
 		if (room) {
 			let roomState = this.globalState.getRoom(room);
@@ -139,8 +141,8 @@ export class Retro {
 	}
 
 	private likeMessage(socket: RetroSocket, messageUid: string): void {
-		let room = socket.room;
-		let player = socket.player;
+		let room = socket.data.room;
+		let player = socket.data.player;
 		console.log(`${room}: like ${messageUid}`);
 		if (room) {
 			let roomState = this.globalState.getRoom(room);
@@ -151,26 +153,26 @@ export class Retro {
 	}
 
 	private disconnect(socket: RetroSocket) {
-		console.log(`disconnect: ${JSON.stringify(socket.player)}, room: ${socket.room}`);
-		if (socket.room) {
-			if (socket.player) {
-				let roomState = this.globalState.getRoom(socket.room);
-				roomState.addLog(`${socket.player.name} left.`);
+		console.log(`disconnect: ${JSON.stringify(socket.data.player)}, room: ${socket.data.room}`);
+		if (socket.data.room) {
+			if (socket.data.player) {
+				let roomState = this.globalState.getRoom(socket.data.room);
+				roomState.addLog(`${socket.data.player.name} left.`);
 			}
-			socket.leave(socket.room);
+			socket.leave(socket.data.room);
 		}
-		if (socket.player) {
-			this.globalState.removePlayer(socket.player);
-			if (socket.room) {
-				this.refreshRoom(socket.room);
-				setTimeout(() => this.globalState.checkRoom(socket.room as string), 5000);
+		if (socket.data.player) {
+			this.globalState.removePlayer(socket.data.player);
+			if (socket.data.room) {
+				this.refreshRoom(socket.data.room);
+				setTimeout(() => this.globalState.checkRoom(socket.data.room as string), 5000);
 			}
 		}
 	}
 
 	private importState(socket: RetroSocket, newState: RetroRoomState) {
-		console.log(`import: ${JSON.stringify(socket.player)}, room: ${socket.room}`);
-		let room = socket.room;
+		console.log(`import: ${JSON.stringify(socket.data.player)}, room: ${socket.data.room}`);
+		let room = socket.data.room;
 		if (room) {
 			let roomState = this.globalState.getRoom(room);
 			roomState.sessionId = newState.sessionId;
@@ -182,8 +184,8 @@ export class Retro {
 				message.uid = RandomUtils.generateUID();
 				message.opened = true;
 			});
-			roomState.addLog(`${socket.player.name} imported saved retrospective.`);
-			this.refreshRoom(room, socket.player);
+			roomState.addLog(`${socket.data.player.name} imported saved retrospective.`);
+			this.refreshRoom(room, socket.data.player);
 		}
 
 	}
