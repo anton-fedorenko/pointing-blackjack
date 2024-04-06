@@ -2,6 +2,8 @@
 
 [Demo]
 
+Requires node 16
+
 ## Start server
 `npm install`
 
