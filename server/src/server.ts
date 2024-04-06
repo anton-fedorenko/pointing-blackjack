@@ -19,7 +19,7 @@ new Pointing(server).start();
 new Retro(server).start();
 
 //start our server
-server.listen(process.env.PORT || 8999, () => {
+server.listen(process.env.PORT || 8021, () => {
 	console.log(`Server started on port ${(server.address() as any).port} :)`);
 });
 
