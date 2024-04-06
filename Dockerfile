@@ -1,18 +1,20 @@
 # Stage 1: Build the app
-FROM node:12 AS builder
+FROM node:16 AS builder
 
 WORKDIR /pointing-blackjack
 
-# Copy everything except the.dockerignore file
-COPY . .
+# Copy everything
+COPY ./frontend ./frontend
+COPY ./server ./server
+COPY ./package*.json .
 
 # Build backend
 RUN cd server && npm install && npx tsc
 # Build Frontend
-RUN cd frontend && npm install && npx ng build --prod
+RUN cd frontend && npm install -f && npx ng build --prod
 
 # Stage 2: Production environment
-FROM node:12
+FROM node:16
 
 WORKDIR /pointing-blackjack
 

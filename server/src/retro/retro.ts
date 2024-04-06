@@ -37,6 +37,7 @@ export class Retro {
 		this.retroSocket = new Server(this.server, {
 			pingInterval: 15000,
 			path: "/retro",
+			allowEIO3: true,
 		});
 
 		this.retroSocket.on("connection", (socket: RetroSocket) => {

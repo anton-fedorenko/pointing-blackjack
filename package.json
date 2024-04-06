@@ -14,14 +14,13 @@
 	"devDependencies": {},
 	"scripts": {
 		"heroku-postbuild": "cd server && npx tsc && cd ../frontend && npx ng build --prod",
-		"build-dev": "cd server && npx tsc && cd ../frontend && npx ng build",
-		"build-prod": "cd server && npx tsc && cd ../frontend && npx ng build --prod",
+		"build-dev": "cd server && npm install && npx tsc && cd ../frontend && npm install && npx ng build",
+		"build-prod": "cd server && npm install && npx tsc && cd ../frontend && npm install && npx ng build --prod",
 		"test": "cd frontend && npx ng lint && npx ng test --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox --code-coverage",
-		"start": "cd server && npx tsc && cd .. && node dist/server.js",
-		"postinstall": "cd server && npm install && cd ../frontend && npm install"
+		"start": "cd server && npx tsc && cd .. && node dist/server.js"
 	},
 	"engines": {
-		"node": "21.x"
+		"node": "16.x"
 	},
 	"cacheDirectories": [
 		"node_modules",

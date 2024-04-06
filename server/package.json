@@ -20,7 +20,7 @@
 		"build": "tsc"
 	},
 	"engines": {
-		"node": "21.x"
+		"node": "16.x"
 	},
 	"author": "Yurius the Great",
 	"license": "MIT"

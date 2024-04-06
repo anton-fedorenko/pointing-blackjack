@@ -30,6 +30,7 @@ export class Pointing {
 		this.pointingSocket = new Server(this.server, {
 			pingInterval: 15000,
 			path: "/pointing",
+			allowEIO3: true,
 		});
 
 		this.pointingSocket.on("connection", (socket: PointingSocket) => {
