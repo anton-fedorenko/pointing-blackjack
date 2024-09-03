@@ -1,5 +1,5 @@
 <div class="vote result-header">Points</div>
-<div class="count result-header">Count</div>
+<div class="count result-header">{{discipline}}</div>
 <ng-container *ngFor="let result of getAggregatedResults() | orderBy:['-count', '-vote']">
 	<div class="vote clickable"
 		title="Click to change vote"

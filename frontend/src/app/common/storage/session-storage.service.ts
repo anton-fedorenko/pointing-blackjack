@@ -19,5 +19,6 @@ export class SessionStorageService implements IStorage {
 	clear() {
 		sessionStorage.removeItem(Property.UID);
 		sessionStorage.removeItem(Property.NAME);
+		sessionStorage.removeItem(Property.DISCIPLINE);
 	}
 }

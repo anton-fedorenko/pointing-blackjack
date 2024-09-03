@@ -8,12 +8,20 @@ import { UserStateService } from '../../common/user-state.service';
 	template: `
 		<div class="login-container">
 			<form role="form" (ngSubmit)="onSubmit()">
-				<label>Who the hell are you? <a href="https://youtu.be/MPYlxeG-8_w?t=119" target="_blank">(c)</a></label>
+				<label class='login-label'>Who are you, warrior?</label>
 				<div class="input-group">
+					<select class="form-control" 
+						id="discipline" 
+						required
+						[(ngModel)]="userDiscipline" name="discipline">
+
+						<option value="" disabled>What do you do?</option>
+						<option *ngFor="let discipline of disciplines" [ngValue]="discipline">{{discipline}}</option>
+					</select>
 					<input type="text"
 						[(ngModel)]="userName"
 						class="form-control"
-						placeholder="Now, say my name"
+                        placeholder="Now, say your name"
 						id="name" name="name"
 						#name="ngModel"
 						required minlength="3" />
@@ -28,6 +36,10 @@ import { UserStateService } from '../../common/user-state.service';
 		</div>
 	`,
 	styles: [`
+		.login-label {
+			line-height: 1;
+			margin-bottom: 0;
+		}
 		.login-container {
 			display: flex;
 			height: 100%;
@@ -42,8 +54,11 @@ import { UserStateService } from '../../common/user-state.service';
 })
 export class LoginComponent implements OnInit {
 	private returnUrl: string;
+	userDiscipline: string = '';
 	userName: string;
 	heisenberg = false;
+	disciplines: string[] = ['BA', 'BE', 'FE', 'QA'];
+
 	constructor(
 		private route: ActivatedRoute,
 		private userStateService: UserStateService,
@@ -57,7 +72,7 @@ export class LoginComponent implements OnInit {
 	onSubmit() {
 		/* istanbul ignore else */
 		if (!isEmpty(this.userName)) {
-			this.userStateService.login(this.userName);
+			this.userStateService.login(this.userName, this.userDiscipline);
 			if (/heisenberg/i.test(this.userName)) {
 				this.heisenberg = true;
 				setTimeout(() => {
@@ -66,6 +81,5 @@ export class LoginComponent implements OnInit {
 			} else this.router.navigateByUrl(this.returnUrl);
 		}
 	}
-
 
 }

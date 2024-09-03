@@ -23,9 +23,10 @@ export class PointingUtils {
 		return sumBy(state.players, player => PointingUtils.isVoted(player.vote) ? 1 : 0) / state.players.length;
 	}
 
-	static getAggregatedResults(roomState: RoomState): IPointingResult[] {
+	static getAggregatedResults(roomState: RoomState, discipline?: string): IPointingResult[] {
 		let max = 0;
 		return chain(roomState.players)
+			.filter((player: Player) => player.discipline === discipline)
 			.countBy((player: Player) => player.vote)
 			.each((count: number) => max = count > max ? count : max)
 			.map((count: number, key: string) => ({count, key: key === 'null' ? null : key}))

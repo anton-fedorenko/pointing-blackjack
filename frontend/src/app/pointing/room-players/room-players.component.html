@@ -5,7 +5,7 @@
 			[ngClass]="{ 'odd': i %2 == 1, 'text-primary': isMyUser(user) } " 
 			[@highlight]="!!highlightedPlayers[user.uid] ? 'active' : 'none'"
 			[style.background-color]="getDifferenceColor(user.vote)">
-			{{user.name}}
+			[{{user.discipline}}] {{user.name}}
 		</span>
 		<div class="user-vote" 
 			[ngSwitch]="isShowVotes()" 

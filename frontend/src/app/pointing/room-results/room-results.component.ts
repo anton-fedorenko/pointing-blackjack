@@ -13,6 +13,7 @@ import { find } from 'lodash';
 })
 export class RoomResultsComponent implements OnInit {
 	@Input() state: RoomState;
+	@Input() discipline?: string;
 
 	constructor(
 		private userState: UserStateService,
@@ -22,7 +23,7 @@ export class RoomResultsComponent implements OnInit {
 	}
 
 	getAggregatedResults(): IPointingResult[] {
-		return PointingUtils.getAggregatedResults(this.state);
+		return PointingUtils.getAggregatedResults(this.state, this.discipline);
 	}
 
 	getVoteColor(vote: Vote): string {

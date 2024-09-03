@@ -18,5 +18,6 @@ export class LocalStorageService implements IStorage {
 	clear() {
 		localStorage.removeItem(Property.UID);
 		localStorage.removeItem(Property.NAME);
+		localStorage.removeItem(Property.DISCIPLINE);
 	}
 }

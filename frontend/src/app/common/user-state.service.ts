@@ -10,6 +10,7 @@ import { isEmpty } from 'lodash';
 export interface UserState {
 	uid: string;
 	name: string;
+	discipline?: string;
 }
 @Injectable({
 	providedIn: 'root'
@@ -29,9 +30,10 @@ export class UserStateService {
 			return true;
 		const uid = this.getStorage().get(Property.UID);
 		const name = this.getStorage().get(Property.NAME);
+		const discipline = this.getStorage().get(Property.DISCIPLINE);
 		const loggedIn = !isEmpty(uid) && !isEmpty(name);
 		if (loggedIn) {
-			this.user = {uid, name};
+			this.user = {uid, name, discipline};
 		}
 		return loggedIn;
 	}
@@ -40,14 +42,15 @@ export class UserStateService {
 		return this.user;
 	}
 
-	login(name: string): void {
+	login(name: string, discipline?: string): void {
 		this.user = {
 			uid: RandomUtils.generateUID(),
-			name
+			name,
+			discipline
 		};
 		this.getStorage().put(Property.UID, this.user.uid);
 		this.getStorage().put(Property.NAME, this.user.name);
-
+		this.getStorage().put(Property.DISCIPLINE, this.user.discipline);
 	}
 
 	logout(): void {
@@ -65,5 +68,9 @@ export class UserStateService {
 
 	getName(): string {
 		return this.user.name;
+	}
+
+	getDiscipline(): string {
+		return this.user.discipline;
 	}
 }

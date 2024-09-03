@@ -17,6 +17,7 @@ interface JoinData {
 	room: string;
 	uid: string;
 	name: string;
+	discipline?: string;
 	role: PlayerRole;
 }
 
@@ -50,15 +51,15 @@ export class Pointing {
 		});
 	}
 
-	private onJoin = (socket: PointingSocket, { room, uid, name, role }: JoinData) => {
-		console.log(`User ${name}(${uid}) joining room ${room}`);
+	private onJoin = (socket: PointingSocket, { room, uid, name, discipline, role }: JoinData) => {
+		console.log(`User [${discipline}]${name}(${uid}) joining room ${room}`);
 		if (socket.data.room) {
 			socket.leave(room);
 		}
 		socket.join(room);
 		socket.data.room = room;
 
-		let player = new PointingPlayer(uid, name);
+		let player = new PointingPlayer(uid, name, discipline);
 		socket.data.player = player;
 
 		this.globalState.removePlayer(player);
@@ -69,7 +70,7 @@ export class Pointing {
 		if (role === 'spectator')
 			roomState.addSpectator(player);
 		else roomState.addPlayer(player);
-		roomState.addLog(`${player.name} joined.`);
+		roomState.addLog(`[${player.discipline}]${player.name} joined.`);
 
 		this.refreshRoom(room, player);
 	}
@@ -81,7 +82,7 @@ export class Pointing {
 		if (room) {
 			let roomState = this.globalState.getRoom(room);
 			roomState.clearVotes();
-			roomState.addLog(`${player.name} cleared votes.`);
+			roomState.addLog(`[${player.discipline}]${player.name} cleared votes.`);
 			this.refreshRoom(room, player);
 		}
 	}
@@ -93,7 +94,7 @@ export class Pointing {
 		if (room) {
 			let roomState = this.globalState.getRoom(room);
 			roomState.showVotes();
-			roomState.addLog(`${player.name} showed votes.`);
+			roomState.addLog(`[${player.discipline}]${player.name} showed votes.`);
 			this.refreshRoom(room, player);
 		}
 	}
@@ -127,7 +128,7 @@ export class Pointing {
 		if (socket.data.room) {
 			if (socket.data.player) {
 				let roomState = this.globalState.getRoom(socket.data.room);
-				roomState.addLog(`${socket.data.player.name} left.`);
+				roomState.addLog(`[${socket.data.player.discipline}]${socket.data.player.name} left.`);
 			}
 			socket.leave(socket.data.room);
 		}

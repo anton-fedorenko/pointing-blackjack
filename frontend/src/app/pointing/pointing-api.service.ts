@@ -31,6 +31,7 @@ export class PointingApiService {
 		this.pointingSocket.emit('join', {
 			uid: this.userState.getUid(),
 			name: this.userState.getUser().name,
+			discipline: this.userState.getUser().discipline,
 			role: this.getLastRole(),
 			room: roomId
 		});

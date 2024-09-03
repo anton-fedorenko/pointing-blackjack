@@ -27,10 +27,20 @@
 			*ngSwitchCase="'cards'"
 			[state]="roomState">
 		</room-cards>
-		<room-results class="room-results"
-			*ngSwitchCase="'results'"
-			[state]="roomState">
-		</room-results>
+		<div *ngSwitchCase="'results'" class="room-results">
+			<room-results class="d-results"
+				[state]="roomState"
+				discipline="BE">
+			</room-results>
+			<room-results class="d-results"
+				[state]="roomState"
+				discipline="FE">
+			</room-results>
+			<room-results class="d-results"
+				[state]="roomState"
+				discipline="QA">
+			</room-results>
+		</div>
 		<div *ngSwitchCase="'progress'" class="room-progress-center">
 			<progress-indicator
 				class="flex-fill"
