@@ -8,6 +8,7 @@ import { map, range } from 'lodash';
 export class ComplicationIndicatorComponent implements OnInit {
 
 	private readonly COMPLEXITY_MAPPING = {
+		0.5: [5],
 		1: [2],
 		2: [1, 2, 5],
 		3: range(1, 6),

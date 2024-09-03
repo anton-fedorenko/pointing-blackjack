@@ -86,7 +86,7 @@ export class RoomPlayersComponent implements OnInit, OnChanges {
 	}
 
 	showDecrease(vote: Vote): boolean {
-		return this.isNumber(vote) && vote > 1;
+		return this.isNumber(vote) && vote > 0;
 	}
 
 	showIncrease(vote: Vote): boolean {
